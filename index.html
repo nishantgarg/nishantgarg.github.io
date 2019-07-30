@@ -130,16 +130,7 @@ body { font: 12px Arial;}
         .tickSizeInner(0)
         .tickPadding(10));
 
-      // Initialize dots with group a
-      var dot = svg
-      .selectAll('circle')
-      .data(data)
-      .enter()
-      .append('circle')
-      .attr("cx", function(d) { return x(+d.month) })
-      .attr("cy", function(d) { return y(+d.volume) })
-      .attr("r", 3)
-      .style("fill", "#69b3a2")
+      
 
       // Create 1st dropdown
       var companyMenu = d3.select("#companyDropdown")
@@ -230,16 +221,33 @@ body { font: 12px Arial;}
 
       // Update the data
       var updateGraph = function(company) {
+        d3.selectAll('svg > g > *').remove();
+        // Set up the x axis
+        var xaxis = svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .attr("class", "x axis")
+        .call(d3.axisBottom(x)
+          .ticks(d3.timeMonth)
+          .tickSize(0, 0)
+          .tickFormat(d3.timeFormat("%B"))
+          .tickSizeInner(0)
+          .tickPadding(10));
+      
+        initialGraph(company)
 
-        dot
+        // Initialize dots with group a
+        var dot = svg
+        .selectAll('circle')
         .data(data)
+        .enter()
+        .append('circle')
+        .attr("cx", function(d) { return x(d.month) })
+        .attr("cy", function(d) { return y(+d.volume) })
+        .attr("r", 3)
+        .style("fill", "#69b3a2")
         .on("mouseover", mouseover)
         .on("mousemove", mousemove)
         .on("mouseleave", mouseleave)
-        .transition()
-        .duration(1000)
-        .attr("cx", function(d) { return x(+d.month) })
-        .attr("cy", function(d) { return y(+d.volume) })
 
         // Filter the data to include only company of interest
         var selectCompany = nest.filter(function(d) {
@@ -282,6 +290,8 @@ body { font: 12px Arial;}
         var selectedCompany = d3.select(this)
         .select("select")
         .property("value")
+
+        console.log("updated company:" + selectedCompany);
 
         // Run update function with the selected company
         updateGraph(selectedCompany)
