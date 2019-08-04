@@ -42,13 +42,30 @@ body { font: 12px Arial;}
     The <b>annotation</b> helps show the exact volume of the stock traded. The slideshow incorporates transitions that help show the sentiment around each of these stocks (increase/decrease in volumes) throughout the year. </br></br>
   </p>
   <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.3.2/d3-annotation.js"></script>
 </head>
 <body>
   <div id = "companyDropdown"></div>
   <div id= "yearDropdown"></div>
   <div id="vizGraph"></div>
 </body>
+
 <script>
+  // Features of the annotation
+    const annotations = [
+    {
+      note: {
+        label: "Hover over to get Volume details",
+        title: "What happened here?"
+      },
+      color: ["red"],
+      x: 487,
+      y: 0,
+      dy: 100,
+      dx: 100
+    }
+    ]
+    
     /// Set the margins
     var margin = {top: 60, right: 100, bottom: 20, left: 80},
     width = 850 - margin.left - margin.right,
@@ -130,8 +147,6 @@ body { font: 12px Arial;}
         .tickSizeInner(0)
         .tickPadding(10));
 
-      
-
       // Create 1st dropdown
       var companyMenu = d3.select("#companyDropdown")
 
@@ -188,6 +203,16 @@ body { font: 12px Arial;}
         .data(function(d) { return d.value.year; })
         .enter()
         .append("path")
+
+        // Add annotation to the chart
+        const makeAnnotations = d3.annotation()
+        .annotations(annotations)
+
+        if (company == "MSFT") {
+          d3.select(".companyGroups")
+          .append("g")
+          .call(makeAnnotations)
+        }
 
         initialPath
         .attr("d", function(d){
@@ -290,8 +315,6 @@ body { font: 12px Arial;}
         var selectedCompany = d3.select(this)
         .select("select")
         .property("value")
-
-        console.log("updated company:" + selectedCompany);
 
         // Run update function with the selected company
         updateGraph(selectedCompany)
